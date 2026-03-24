@@ -16,7 +16,7 @@ import seaborn as sns
 import glob, pickle, warnings
 warnings.filterwarnings('ignore')
  
-# ── 1. LOAD & CLEAN DATA ─────────────────────────────────────────────────
+# ── 1. LOAD & CLEAN DATA 
 print("Loading dataset...")
 b_files = glob.glob('./datasets/Benign/stateless_*.csv')
 m_files = (glob.glob('./datasets/Attack_Light_Benign/Attacks/stateless_*.csv') +
@@ -46,14 +46,14 @@ df = pd.concat([clean(benign), clean(malicious)], ignore_index=True)
 print(f"Dataset: {len(df):,}  "
       f"(Benign: {(df.label==0).sum():,} | Malicious: {(df.label==1).sum():,})")
  
-# ── 2. TRAIN / TEST SPLIT (80/20 stratified) ────────────────────────────
+# ── 2. TRAIN / TEST SPLIT (80/20 stratified) 
 X, y = df[FEATURES], df['label']
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, stratify=y, random_state=42)
  
 print(f"Training: {len(X_train):,}  |  Test: {len(X_test):,}")
  
-# ── 3. NORMALISE ─────────────────────────────────────────────────────────
+# ── 3. NORMALISE 
 scaler = MinMaxScaler()
 X_train_s = scaler.fit_transform(X_train)
 X_test_s  = scaler.transform(X_test)
@@ -69,7 +69,7 @@ with open('./backend/scaler.json', 'w') as fh:
     json.dump(scaler_params, fh, indent=2)
 print("scaler.json saved to ./backend/")
  
-# ── 4. TRAIN RANDOM FOREST ───────────────────────────────────────────────
+# ── 4. TRAIN RANDOM FOREST 
 print("Training Random Forest (n_estimators=100, random_state=42)...")
 rf = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
 rf.fit(X_train_s, y_train)
@@ -80,7 +80,7 @@ with open('./backend/rf_model.pkl', 'wb') as fh:
     pickle.dump(rf, fh)
 print("rf_model.pkl saved to ./backend/")
  
-# ── 5. EVALUATE ──────────────────────────────────────────────────────────
+# ── 5. EVALUATE 
 y_pred = rf.predict(X_test_s)
 cm     = confusion_matrix(y_test, y_pred)
 TN, FP, FN, TP = cm.ravel()
@@ -104,7 +104,7 @@ feat_imp = pd.Series(rf.feature_importances_,
 print("\nTop feature importances:")
 print(feat_imp.round(4).to_string())
  
-# ── 6. FIGURES ───────────────────────────────────────────────────────────
+# ── 6. FIGURES 
 plt.rcParams.update({'font.family': 'DejaVu Sans', 'font.size': 12})
 fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 fig.patch.set_facecolor('#FAFAFA')
